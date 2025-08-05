@@ -1,46 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>QR Code Ticket Scanner</title>
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Scanner App</title>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f4f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    header {
+      background-color: #004080;
+      color: white;
+      width: 100%;
+      padding: 1rem 0;
+    }
+
+    header img {
+      height: 50px;
+      margin-bottom: 0.5rem;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    #reader {
+      width: 90%;
+      max-width: 400px;
+      margin-top: 2rem;
+    }
+
     #result {
-      margin-top: 20px;
-      font-size: 20px;
-      font-weight: bold;
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      color: #004080;
+      background-color: #e0f0ff;
+      padding: 1rem;
+      border-radius: 8px;
+      word-wrap: break-word;
+    }
+
+    footer {
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: #888;
     }
   </style>
+
+  <!-- QR Scanner Library -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
-  <h2>Scan QR Code</h2>
-  <div id="reader" style="width: 300px;"></div>
-  <div id="result">Waiting for scan...</div>
+
+  <header>
+    <!-- Logo image: You can upload your own and update the src -->
+    <img src="logo.png" alt="Logo">
+    <h1>Smart QR Scanner</h1>
+  </header>
+
+  <div id="reader"></div>
+
+  <div id="result">Scan a QR code to see the result here.</div>
+
+  <footer>
+    &copy; 2025 Your Company or Project Name
+  </footer>
 
   <script>
-    function onScanSuccess(qrMessage) {
-      document.getElementById('result').innerText = "Scanned: " + qrMessage;
-
-      // Make request to your Apps Script Web App
-      const scriptURL = "https://script.google.com/macros/s/AKfycbwguKy88PFo1wJz-1l1nZtqyJqpyWArgVZ_pIt-0gtwBFn3J4z44XhIdxKeHu2s04E/exec?qr=" + encodeURIComponent(qrMessage);
-
-      fetch(scriptURL)
-        .then(res => res.text())
-        .then(data => {
-          document.getElementById('result').innerText = "Validation Result: " + data;
-        })
-        .catch(err => {
-          document.getElementById('result').innerText = "Error: " + err;
-        });
+    function onScanSuccess(decodedText, decodedResult) {
+      document.getElementById("result").innerText = `✅ Scanned: ${decodedText}`;
     }
 
-    new Html5Qrcode("reader").start(
-      { facingMode: "environment" }, 
-      {
-        fps: 10,
-        qrbox: 250
-      },
-      onScanSuccess
+    function onScanError(errorMessage) {
+      console.warn(`Scan error: ${errorMessage}`);
+    }
+
+    const html5QrcodeScanner = new Html5QrcodeScanner(
+      "reader",
+      { fps: 10, qrbox: 250 },
+      false
     );
+
+    html5QrcodeScanner.render(onScanSuccess, onScanError);
   </script>
 </body>
 </html>
